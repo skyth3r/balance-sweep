@@ -85,10 +85,22 @@ func run() error {
 		return err
 	}
 
+	if b.Balance%100 == 0 {
+		return nil
+	}
+
+	fmt.Printf("Balance: %d\n", b.Balance)
+
 	fb := float64(b.Balance) / 100
 	fbr := math.Floor(fb)
 	p := fb - fbr
-	ip := int64(p * 100)
+
+	// Adding 0.5 when converting to int64 to solve the issue of how floating point
+	// numbers are represented in memory. Adding 0.5 introduces a bias that will round
+	// the number to the nearest integer. This bias is small enough to not affect the
+	// integer representation of the number but large enough to push the float over the
+	// edge in case of precision errors.
+	ip := int64(p*100 + 0.5)
 	if ip == 0 {
 		return nil
 	}
