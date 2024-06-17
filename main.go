@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"math"
 	"os"
 	"strings"
 
@@ -89,19 +88,9 @@ func run() error {
 		return nil
 	}
 
-	fmt.Printf("Balance: %d\n", b.Balance)
-
-	fb := float64(b.Balance) / 100
-	fbr := math.Floor(fb)
-	p := fb - fbr
-
-	// Adding 0.5 when converting to int64 to solve the issue of how floating point
-	// numbers are represented in memory. Adding 0.5 introduces a bias that will round
-	// the number to the nearest integer. This bias is small enough to not affect the
-	// integer representation of the number but large enough to push the float over the
-	// edge in case of precision errors.
-	ip := int64(p*100 + 0.5)
-	if ip == 0 {
+	rounded := (b.Balance / 100) * 100
+	pennies := b.Balance - rounded
+	if pennies == 0 {
 		return nil
 	}
 
@@ -110,7 +99,7 @@ func run() error {
 		return err
 	}
 
-	err = depositToPot(client, ukRetailAccountID, *SavingsPotID, ip)
+	err = depositToPot(client, ukRetailAccountID, *SavingsPotID, pennies)
 	if err != nil {
 		return err
 	}
